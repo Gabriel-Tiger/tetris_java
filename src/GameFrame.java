@@ -1,8 +1,8 @@
 import javax.swing.*;
 
 public class GameFrame extends JFrame{
-    private JPanel panel;
-    private JPanel panelGame;
+    private JPanel panel  = new JPanel();
+    private JPanel panelGame = new JPanel();
 
     GameFrame(){
         panelGame.add(new GamePanel());
