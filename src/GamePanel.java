@@ -19,7 +19,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	boolean running = false;
 	Timer timer;
 	Random random;
-	ScoreScreen scoreScreen = new ScoreScreen();
+	//ScoreScreen scoreScreen = new ScoreScreen();
 	Engine engine;
 
 	GamePanel() {
@@ -28,8 +28,8 @@ public class GamePanel extends JPanel implements ActionListener {
 		this.setBackground(Color.BLACK);
 		this.setFocusable(true);
 		this.addKeyListener(new MyKeyAdapter());
-		scoreScreen.setVisible(true);
-		scoreScreen.updatePontuacao("0000");
+		//scoreScreen.setVisible(true);
+		//scoreScreen.updatePontuacao("0000");
 		startGame();
 	}
 
@@ -113,7 +113,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			player1Score = player1Score + 10;
 			System.out.println(player1Score);
 			engine.lineScoreDownAnimation(score);
-			scoreScreen.updatePontuacao(String.valueOf(player1Score));
+			//scoreScreen.updatePontuacao(String.valueOf(player1Score));
 			playSound.playSound("point-01.wav");
 			makeScore();
 		}
