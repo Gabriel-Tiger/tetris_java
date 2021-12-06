@@ -138,7 +138,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			case KeyEvent.VK_LEFT: {
 				direction = 'l';
 				if (engine.collision() == 0) {
-					// move();
+					 move();
 				}
 				repaint();
 //                    System.out.println(direction);
@@ -147,7 +147,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			case KeyEvent.VK_RIGHT: {
 				direction = 'r';
 				if (engine.collision() == 0) {
-					// move();
+					 move();
 				}
 				repaint();
 //                    System.out.println(direction);

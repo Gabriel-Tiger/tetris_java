@@ -110,6 +110,7 @@ public class Engine {
                 }else{
                     setW(getW() - 1);
                 }
+                layer2 = prop.propBuild(propSelected,getH(), getW(),color,propSide);
             }
         }catch (Exception e){
 
@@ -120,7 +121,7 @@ public class Engine {
             }
         }
         hit = 0;
-        down();
+//        down();
     }
     void down(){
         try {
