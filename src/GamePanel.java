@@ -12,8 +12,6 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	Score score = new Score();
 	int player1Score = 0;
-	final int x[] = new int[StaticValues.GAME_UNITS];
-	final int y[] = new int[StaticValues.GAME_UNITS];
 	int spawnX;
 	int spawnY;
 	int flipLock = 0;
@@ -49,7 +47,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	public void draw(Graphics g) {
 
-		int table[][] = engine.getTable();
+		int[][] table = engine.getTable();
 		// Scan the table matrix and draw
 		for (int j = 0; j < (StaticValues.WIDTH_UNIT); j++) {
 			for (int k = 0; k < (StaticValues.HEIGHT_UNIT); k++) {
@@ -60,7 +58,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				}
 			}
 		}
-		int layer[][] = engine.getLayer();
+		int[][] layer = engine.getLayer();
 		// Scan the prop matrix layer and draw
 		for (int j = 0; j < (StaticValues.WIDTH_UNIT); j++) {
 			for (int k = 0; k < (StaticValues.HEIGHT_UNIT); k++) {
@@ -72,7 +70,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			}
 		}
 
-		g.setColor(Color.darkGray);
+		g.setColor(Color.DARK_GRAY);
 		for (int i = 0; i < StaticValues.SCREEN_HEIGHT / StaticValues.UNIT_SIZE; i++) {
 			g.drawLine(i * StaticValues.UNIT_SIZE, 0, i * StaticValues.UNIT_SIZE, StaticValues.SCREEN_HEIGHT);
 			g.drawLine(0, i * StaticValues.UNIT_SIZE, StaticValues.SCREEN_WIDTH, i * StaticValues.UNIT_SIZE);
@@ -93,17 +91,10 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 
 	public void checkCollisions() {
-		// Check down border
 		if (engine.collision() == 2) {
 			engine.tableAddPieces();
-			score = engine.lineScoreDetect();
-			if (score.done) {
-				player1Score = player1Score + 10;
-				System.out.println(player1Score);
-				engine.lineScoreDownAnimation(score);
-				playSound.playSound("point-01.wav"); // nao faz 2 plin plin
-				checkCollisions();
-			}
+			engine.clearProp();
+			makeScore();
 			engine.reset();
 		}
 		if (engine.collision() == 3) {
@@ -113,7 +104,16 @@ public class GamePanel extends JPanel implements ActionListener {
 			engine.reset();
 			running = false;
 		}
-
+	}
+	void makeScore(){
+		score = engine.lineScoreDetect();
+		if (score.done) {
+			player1Score = player1Score + 10;
+			System.out.println(player1Score);
+			engine.lineScoreDownAnimation(score);
+			playSound.playSound("point-01.wav");
+			makeScore();
+		}
 	}
 
 	public void gameOver(Graphics g) {
