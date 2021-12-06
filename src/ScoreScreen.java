@@ -40,7 +40,7 @@ public class ScoreScreen extends JFrame implements ActionListener{
         this.pack();
         this.setAlwaysOnTop(true);
         this.setVisible(true);
-        this.setFocusable(false);
+        this.setFocusable(true);
         this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 
 
