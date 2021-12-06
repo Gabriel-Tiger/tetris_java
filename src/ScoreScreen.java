@@ -8,6 +8,7 @@ public class ScoreScreen extends JFrame{
     ScoreScreen() {
 //        mainPanel.add(scorePanel);
         this.add(mainPanel);
+        this.setUndecorated(true);
         this.pack();
         this.setVisible(true);
         this.setFocusable(true);
