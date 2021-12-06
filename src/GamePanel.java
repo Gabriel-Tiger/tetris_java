@@ -28,6 +28,9 @@ public class GamePanel extends JPanel implements ActionListener {
 		this.setBackground(Color.BLACK);
 		this.setFocusable(true);
 		this.addKeyListener(new MyKeyAdapter());
+		ScoreScreen scoreScreen = new ScoreScreen();
+		scoreScreen.setVisible(true);
+		scoreScreen.updatePontuacao("100");
 		startGame();
 	}
 
