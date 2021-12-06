@@ -13,6 +13,7 @@ public class GameFrame extends JFrame{
         this.setTitle("Serginho Simulator - By Tiger");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.pack();
+        this.setAlwaysOnTop(true);
         this.setVisible(true);
 //        this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         this.setLocationRelativeTo(null);
