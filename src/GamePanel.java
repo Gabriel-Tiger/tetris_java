@@ -1,45 +1,23 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.util.Random;
-import java.util.concurrent.Delayed;
 
-public class GamePanel extends JPanel implements ActionListener {
-	int DELAY = 200;
+public class GamePanel extends JPanel {
 
-	Score score = new Score();
-	int player1Score = 0;
-	int spawnX;
-	int spawnY;
-	int flipLock = 0;
-	char direction = 'd';
-	boolean running = false;
-	Timer timer;
-	Random random;
-	//ScoreScreen scoreScreen = new ScoreScreen();
-	Engine engine;
+	int[][] a = new int[StaticValues.HEIGHT_UNIT][StaticValues.WIDTH_UNIT];
+	int[][] b = new int[StaticValues.HEIGHT_UNIT][StaticValues.WIDTH_UNIT];
+
 
 	GamePanel() {
-		random = new Random();
 		this.setPreferredSize(new Dimension(StaticValues.SCREEN_WIDTH, StaticValues.SCREEN_HEIGHT));
 		this.setBackground(Color.BLACK);
 		this.setFocusable(true);
-		this.addKeyListener(new MyKeyAdapter());
-		//scoreScreen.setVisible(true);
-		//scoreScreen.updatePontuacao("0000");
-		startGame();
 	}
-
-	public void startGame() {
-		newBlock();
-		engine = new Engine(spawnX, spawnY);
-		running = true;
-		timer = new Timer(DELAY, this);
-		timer.start();
-
+	void setTables(int[][] layer, int[][] table){
+		a = layer;
+		b = table;
+	}
+	void commandRepaint(){
+		repaint();
 	}
 
 	public void paintComponent(Graphics g) {
@@ -49,23 +27,22 @@ public class GamePanel extends JPanel implements ActionListener {
 
 	public void draw(Graphics g) {
 
-		int[][] table = engine.getTable();
 		// Scan the table matrix and draw
 		for (int j = 0; j < (StaticValues.WIDTH_UNIT); j++) {
 			for (int k = 0; k < (StaticValues.HEIGHT_UNIT); k++) {
-				if (table[k][j] != 0) {
-					g.setColor(color(table[k][j]));
+				if (b[k][j] != 0) {
+					g.setColor(color(b[k][j]));
 					g.fillRect((j * StaticValues.UNIT_SIZE), (k * StaticValues.UNIT_SIZE), StaticValues.UNIT_SIZE,
 							StaticValues.UNIT_SIZE);
 				}
 			}
 		}
-		int[][] layer = engine.getLayer();
+
 		// Scan the prop matrix layer and draw
 		for (int j = 0; j < (StaticValues.WIDTH_UNIT); j++) {
 			for (int k = 0; k < (StaticValues.HEIGHT_UNIT); k++) {
-				if (layer[k][j] != 0) {
-					g.setColor(color(layer[k][j]));
+				if (a[k][j] != 0) {
+					g.setColor(color(a[k][j]));
 					g.fillRect((j * StaticValues.UNIT_SIZE), (k * StaticValues.UNIT_SIZE), StaticValues.UNIT_SIZE,
 							StaticValues.UNIT_SIZE);
 				}
@@ -79,106 +56,6 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 
 	}
-
-	public void newBlock() {
-		spawnX = 0;
-		spawnY = random.nextInt(StaticValues.WIDTH_UNIT);
-	}
-
-	public void move() {
-		engine.move(direction);
-		direction = 'd';
-		repaint();
-		flipLock = 0;
-	}
-
-	public void checkCollisions() {
-		if (engine.collision() == 2) {
-			engine.tableAddPieces();
-			engine.clearProp();
-			makeScore();
-			engine.reset();
-		}
-		if (engine.collision() == 3) {
-			System.out.println("GAME OVER");
-			playSound.playSound("hit-03.wav");
-			engine.tableAddPieces();
-			engine.reset();
-			running = false;
-		}
-	}
-	void makeScore(){
-		score = engine.lineScoreDetect();
-		if (score.done) {
-			player1Score = player1Score + 10;
-			System.out.println(player1Score);
-			engine.lineScoreDownAnimation(score);
-			//scoreScreen.updatePontuacao(String.valueOf(player1Score));
-			playSound.playSound("point-01.wav");
-			makeScore();
-		}
-	}
-
-	public void gameOver(Graphics g) {
-
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		if (running) {
-			checkCollisions();
-			if (engine.collision() != 2) {
-				move();
-			}
-		}
-		// repaint();
-	}
-
-	public class MyKeyAdapter extends KeyAdapter {
-		@Override
-		public void keyPressed(KeyEvent e) {
-			switch (e.getKeyCode()) {
-			case KeyEvent.VK_LEFT: {
-				direction = 'l';
-				if (engine.collision() == 0) {
-					 move();
-				}
-				repaint();
-//                    System.out.println(direction);
-				break;
-			}
-			case KeyEvent.VK_RIGHT: {
-				direction = 'r';
-				if (engine.collision() == 0) {
-					 move();
-				}
-				repaint();
-//                    System.out.println(direction);
-				break;
-			}
-			case KeyEvent.VK_DOWN: {
-				direction = 'd';
-				if (engine.collision() == 0) {
-					move();
-				}
-				repaint();
-				break;
-			}
-			case KeyEvent.VK_UP: {
-				if (flipLock == 0) {
-					if (engine.collision() == 0) {
-						engine.flip();
-						flipLock = 1;
-					}
-					playSound.playSound("rotate.wav");
-					repaint();
-				}
-				break;
-			}
-			}
-		}
-	}
-
 	Color color(int a) {
 		if (a == 1)
 			return Color.cyan;
@@ -191,4 +68,5 @@ public class GamePanel extends JPanel implements ActionListener {
 
 		return Color.MAGENTA;
 	}
+
 }
