@@ -29,19 +29,21 @@ public class ScoreScreen extends JFrame implements ActionListener{
     JInternalFrame gameScreen = new JInternalFrame(("Tetris"), false, false, false,false);
 
     ScoreScreen() {
+        this.addKeyListener(new MyKeyAdapter());
         this.setUndecorated(true);//remove as bordas do windows
         JDesktopPane desktopPane = new JDesktopPane();
-        desktopHolder.add(desktopPane);
         desktopPane.add(gameScreen);
+        desktopHolder.add(desktopPane);
         Color c = new Color(69,73,75);
         desktopPane.setBackground(c);
 
         this.add(mainPanel);
         this.pack();
-        this.setAlwaysOnTop(true);
-        this.setVisible(true);
+        //this.setAlwaysOnTop(true);
         this.setFocusable(true);
+        this.requestFocusInWindow();
         this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        this.setVisible(true);
 
 
 
@@ -66,7 +68,6 @@ public class ScoreScreen extends JFrame implements ActionListener{
         gameScreen.moveToFront();
         gameScreen.setLocation(StaticValues.SCREEN_WIDTH,0);
 
-        this.addKeyListener(new MyKeyAdapter());
         //scoreScreen.setVisible(true);
         //scoreScreen.updatePontuacao("0000");
         startGame();
@@ -139,12 +140,12 @@ public class ScoreScreen extends JFrame implements ActionListener{
                 move();
             }
         }
-        // repaint();
     }
 
     public class MyKeyAdapter extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent e) {
+            System.out.println("Click");
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_LEFT: {
                     direction = 'l';
