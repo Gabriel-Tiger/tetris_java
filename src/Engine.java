@@ -7,7 +7,7 @@ public class Engine {
     int [][]layer2 = new int[StaticValues.HEIGHT_UNIT][StaticValues.WIDTH_UNIT];
     PropBuild prop =new PropBuild();
     int hit = 0;
-    int propCount = 7;
+    int propCount = 8;
     int propSelected;
     int propSide = 1;
 
@@ -21,7 +21,6 @@ public class Engine {
     Engine(int x, int y){
         setH(x);
         setW(y);
-        color = generateRandom(5);
         createTable();
 
         reset();
@@ -261,9 +260,8 @@ public class Engine {
 
     void reset(){
         //initialization
-        color = generateRandom(5);
-
         propSelected = generateRandom(propCount);
+        color = propSelected;
 
         hit = 0;
         for(int j=0;j<StaticValues.WIDTH_UNIT;j++){

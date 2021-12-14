@@ -57,16 +57,26 @@ public class GamePanel extends JPanel {
 
 	}
 	Color color(int a) {
+		Color c = Color.red;
 		if (a == 1)
-			return Color.cyan;
+			c = new Color(50,113,168);
 		else if (a == 2)
-			return Color.BLUE;
+			c = new Color(255,255,0);
 		else if (a == 3)
-			return Color.green;
+			c = new Color(132,0,255);
 		else if (a == 4)
+			c = new Color(255,128,0);
+		else if (a == 5)
+			c = new Color(0,54,115);
+		else if (a == 6)
+			c = new Color(255,0,0);
+		else if (a == 7)
+			c = new Color(29,115,0);
+		else if (a == 8)
 			return Color.yellow;
 
-		return Color.MAGENTA;
+
+		return c;
 	}
 
 }

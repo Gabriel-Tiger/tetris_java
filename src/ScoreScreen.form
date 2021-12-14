@@ -7,8 +7,10 @@
     </constraints>
     <properties>
       <background color="-12236469"/>
-      <focusable value="false"/>
-      <requestFocusEnabled value="false"/>
+      <focusCycleRoot value="true"/>
+      <focusTraversalPolicyProvider value="true"/>
+      <focusable value="true"/>
+      <requestFocusEnabled value="true"/>
     </properties>
     <border type="none"/>
     <children>
@@ -19,8 +21,8 @@
         </constraints>
         <properties>
           <background color="-12236469"/>
-          <focusable value="false"/>
-          <requestFocusEnabled value="false"/>
+          <focusable value="true"/>
+          <requestFocusEnabled value="true"/>
         </properties>
         <border type="none">
           <color color="-13289414"/>

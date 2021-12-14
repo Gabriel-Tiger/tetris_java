@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.plaf.BorderUIResource;
+import javax.swing.plaf.basic.BasicInternalFrameUI;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Random;
@@ -11,7 +13,7 @@ public class ScoreScreen extends JFrame implements ActionListener{
     private JButton xButton;
     private JPanel desktopHolder;
 
-    int DELAY = 200;
+
 
     Score score = new Score();
     int player1Score = 0;
@@ -29,13 +31,24 @@ public class ScoreScreen extends JFrame implements ActionListener{
     JInternalFrame gameScreen = new JInternalFrame(("Tetris"), false, false, false,false);
 
     ScoreScreen() {
-        this.addKeyListener(new MyKeyAdapter());
+        this.addKeyListener(new MyKeyAdapter());//adiciona reconhecimento das teclas
         this.setUndecorated(true);//remove as bordas do windows
-        JDesktopPane desktopPane = new JDesktopPane();
-        desktopPane.add(gameScreen);
-        desktopHolder.add(desktopPane);
-        Color c = new Color(69,73,75);
-        desktopPane.setBackground(c);
+        JDesktopPane desktopPane = new JDesktopPane();//pane de suporte para internalframe
+        desktopPane.add(gameScreen);// adiciona o internalframe ao pane de suporte
+        desktopHolder.add(desktopPane);// adiciona o pane de suporte ao pane de desktop criado no swing
+        Color c = new Color(69,73,75);//cria cor cinza em codigo RGB
+        desktopPane.setBackground(c);// seta o bg do pane de suporte para cinza(mesma cor das demais ui do programa)
+
+        xButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+
+        setPlayer1InternalFrame();
+
+        startGame();
 
         this.add(mainPanel);
         this.pack();
@@ -45,39 +58,27 @@ public class ScoreScreen extends JFrame implements ActionListener{
         this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         this.setVisible(true);
 
+    }
 
-
-        xButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
-
-        // para nao mover
+    void setPlayer1InternalFrame(){
+        //para nao mover--------
         for(MouseListener listener : ((javax.swing.plaf.basic.BasicInternalFrameUI) this.gameScreen.getUI()).getNorthPane().getMouseListeners()){
             ((javax.swing.plaf.basic.BasicInternalFrameUI) this.gameScreen.getUI()).getNorthPane().removeMouseListener(listener);
         }
-
-        //setando internalframe
+        //----------------------
+        ((javax.swing.plaf.basic.BasicInternalFrameUI)gameScreen.getUI()).setNorthPane(null);//remove o title bar do internaljframe
         gameScreen.add(gamePanel);
         gameScreen.putClientProperty("JInternalFrame.isPalette", Boolean.TRUE);
         gameScreen.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
         gameScreen.setVisible(true);
-        gameScreen.setSize(StaticValues.SCREEN_WIDTH, StaticValues.SCREEN_HEIGHT+10);
+        gameScreen.setSize(new Dimension(400, 800));
         gameScreen.moveToFront();
         gameScreen.setLocation(StaticValues.SCREEN_WIDTH,0);
-
-        //scoreScreen.setVisible(true);
-        //scoreScreen.updatePontuacao("0000");
-        startGame();
-
     }
+
     void updatePontuacao(String text){
         pontuacao.setText(text);
     }
-
-
 
     public void newBlock() {
         spawnX = 0;
@@ -119,17 +120,23 @@ public class ScoreScreen extends JFrame implements ActionListener{
             makeScore();
         }
     }
+    void littleScore(){
+        player1Score = player1Score + 1;
+        updatePontuacao(String.valueOf(player1Score));
+    }
 
     public void gameOver(Graphics g) {
 
     }
 
     public void startGame() {
+        playSound.playSound("TetrisMusic.wav");
         newBlock();
         engine = new Engine(spawnX, spawnY);
         running = true;
-        timer = new Timer(DELAY, this);
+        timer = new Timer(StaticValues.DELAY, this);
         timer.start();
+        gamePanel.commandRepaint();
     }
 
     @Override
@@ -145,7 +152,6 @@ public class ScoreScreen extends JFrame implements ActionListener{
     public class MyKeyAdapter extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent e) {
-            System.out.println("Click");
             switch (e.getKeyCode()) {
                 case KeyEvent.VK_LEFT: {
                     direction = 'l';
@@ -170,6 +176,7 @@ public class ScoreScreen extends JFrame implements ActionListener{
                 case KeyEvent.VK_DOWN: {
                     direction = 'd';
                     if (engine.collision() == 0) {
+                        littleScore();
                         move();
                     }
                     gamePanel.setTables(engine.getLayer(), engine.getTable());

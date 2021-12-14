@@ -2,26 +2,30 @@ public class PropBuild {
     int[][] propBuild(int type, int h, int w, int color, int side){
         int [][]layer = new int[StaticValues.HEIGHT_UNIT][StaticValues.WIDTH_UNIT];
         switch (type){
-            case 1:{ // prop N type
-                if (side == 1) {
+            case 1:{ // prop z type
+                if (side == 1 || side == 3) {
                     layer[h+1][w+2]=color;
                     layer[h+1][w+1]=color;
                     layer[h][w+1]=color;
                     layer[h][w]=color;
                 }
-                if (side == 2) {
+                if (side == 2 || side == 4) {
                     layer[h][w+1]=color;
                     layer[h+1][w+1]=color;
                     layer[h+1][w]=color;
                     layer[h+2][w]=color;
                 }
-                if (side == 3) {
-                    layer[h+1][w]=color;
-                    layer[h+1][w+1]=color;
+
+                break;
+            }
+            case 7:{ // prop z type
+                if (side == 1 || side == 3) {
                     layer[h][w+1]=color;
                     layer[h][w+2]=color;
+                    layer[h+1][w+1]=color;
+                    layer[h+1][w]=color;
                 }
-                if (side == 4) {
+                if (side == 2 || side == 4) {
                     layer[h][w]=color;
                     layer[h+1][w]=color;
                     layer[h+1][w+1]=color;
@@ -30,6 +34,7 @@ public class PropBuild {
 
                 break;
             }
+
             case 2:{ // prop CUBE type
                 layer[h][w]=color;
                 layer[h][w+1]=color;
