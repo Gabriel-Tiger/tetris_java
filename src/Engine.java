@@ -5,17 +5,23 @@ public class Engine {
     int [][]table = new int[StaticValues.HEIGHT_UNIT][StaticValues.WIDTH_UNIT];
     int [][]layer = new int[StaticValues.HEIGHT_UNIT][StaticValues.WIDTH_UNIT];
     int [][]layer2 = new int[StaticValues.HEIGHT_UNIT][StaticValues.WIDTH_UNIT];
+    int [][]next = new int[StaticValues.HEIGHT_UNIT][StaticValues.WIDTH_UNIT];
+    int [][]hold = new int[StaticValues.HEIGHT_UNIT][StaticValues.WIDTH_UNIT];
     PropBuild prop =new PropBuild();
+    Random random3 = new Random();
+
     int hit = 0;
     int propCount = 8;
-    int propSelected;
+    int propSelected = generateRandom(propCount);
+    int propSelected2 = generateRandom(propCount);
+    int propSelected3 = generateRandom(propCount);
+    int propSelected4 = generateRandom(propCount);
     int propSide = 1;
 
     int startPoint;
     int h=0;
     int v=0;
 
-    Random random3 = new Random();
     int color = 2;
 
     Engine(int x, int y){
@@ -41,6 +47,56 @@ public class Engine {
                 table[k][j] = 0;
             }
         }
+
+    }
+
+    void cleatNext(){
+        for(int j=0;j<StaticValues.NEXT_WIDTH;j++){
+            for(int k=0;k<StaticValues.NEXT_HEIGHT;k++){
+                next[k][j] = 0;
+            }
+        }
+    }
+
+    public int[][] getNext() {
+        cleatNext();
+        generateNext();
+        return next;
+    }
+
+    public void setNext(int[][] next) {
+        this.next = next;
+    }
+
+    void generateNext(){
+        int [][]a = new int[StaticValues.HEIGHT_UNIT][StaticValues.WIDTH_UNIT];
+        a = prop.propBuild(propSelected2,1, 1,propSelected2,1);// 1
+
+        for(int j=0;j<StaticValues.NEXT_WIDTH;j++){
+            for(int k=0;k<StaticValues.NEXT_HEIGHT;k++){
+                if (a[k][j]!=0){
+                    next[k][j] = a[k][j];
+                }
+            }
+        }
+        a = prop.propBuild(propSelected3,4, 1,propSelected3,1);// 2
+        for(int j=0;j<StaticValues.NEXT_WIDTH;j++){
+            for(int k=0;k<StaticValues.NEXT_HEIGHT;k++){
+                if (a[k][j]!=0){
+                    next[k][j] = a[k][j];
+                }
+            }
+        }
+        a = prop.propBuild(propSelected4,7, 1,propSelected4,1);// 3
+        for(int j=0;j<StaticValues.NEXT_WIDTH;j++){
+            for(int k=0;k<StaticValues.NEXT_HEIGHT;k++){
+                if (a[k][j]!=0){
+                    next[k][j] = a[k][j];
+                }
+            }
+        }
+
+
     }
 
 
@@ -260,7 +316,10 @@ public class Engine {
 
     void reset(){
         //initialization
-        propSelected = generateRandom(propCount);
+        propSelected = propSelected2;
+        propSelected2 = propSelected3;
+        propSelected3 = propSelected4;
+        propSelected4 = generateRandom(propCount);
         color = propSelected;
 
         hit = 0;

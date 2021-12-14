@@ -12,7 +12,7 @@ public class ScoreScreen extends JFrame implements ActionListener{
     private JPanel topBar;
     private JButton xButton;
     private JPanel desktopHolder;
-
+    private JPanel piecesHolder;
 
 
     Score score = new Score();
@@ -28,16 +28,27 @@ public class ScoreScreen extends JFrame implements ActionListener{
     Engine engine;
 
     GamePanel gamePanel = new GamePanel();
+    NextPanel nextPanel = new NextPanel();
     JInternalFrame gameScreen = new JInternalFrame(("Tetris"), false, false, false,false);
+    JInternalFrame nextScreen = new JInternalFrame(("Tetris"), false, false, false,false);
 
     ScoreScreen() {
         this.addKeyListener(new MyKeyAdapter());//adiciona reconhecimento das teclas
         this.setUndecorated(true);//remove as bordas do windows
+        ////game screen ------------
         JDesktopPane desktopPane = new JDesktopPane();//pane de suporte para internalframe
         desktopPane.add(gameScreen);// adiciona o internalframe ao pane de suporte
         desktopHolder.add(desktopPane);// adiciona o pane de suporte ao pane de desktop criado no swing
         Color c = new Color(69,73,75);//cria cor cinza em codigo RGB
         desktopPane.setBackground(c);// seta o bg do pane de suporte para cinza(mesma cor das demais ui do programa)
+        ////------------------------
+
+        ////next screen ------------
+        JDesktopPane nextPane = new JDesktopPane();
+        nextPane.add(nextScreen);
+        piecesHolder.add(nextPane);
+        nextPane.setBackground(c);
+        ////------------------------
 
         xButton.addActionListener(new ActionListener() {
             @Override
@@ -47,6 +58,7 @@ public class ScoreScreen extends JFrame implements ActionListener{
         });
 
         setPlayer1InternalFrame();
+        setNextInternalFrame();
 
         startGame();
 
@@ -75,6 +87,22 @@ public class ScoreScreen extends JFrame implements ActionListener{
         gameScreen.moveToFront();
         gameScreen.setLocation(StaticValues.SCREEN_WIDTH,0);
     }
+    void setNextInternalFrame(){
+        //para nao mover--------
+        for(MouseListener listener : ((javax.swing.plaf.basic.BasicInternalFrameUI) this.nextScreen.getUI()).getNorthPane().getMouseListeners()){
+            ((javax.swing.plaf.basic.BasicInternalFrameUI) this.nextScreen.getUI()).getNorthPane().removeMouseListener(listener);
+        }
+        //----------------------
+        ((javax.swing.plaf.basic.BasicInternalFrameUI)nextScreen.getUI()).setNorthPane(null);//remove o title bar do internaljframe
+        nextScreen.add(nextPanel);
+        nextScreen.putClientProperty("JInternalFrame.isPalette", Boolean.TRUE);
+        nextScreen.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
+        nextScreen.setVisible(true);
+        nextScreen.setSize(new Dimension(StaticValues.SCREEN_WIDTH/2, StaticValues.SCREEN_HEIGHT/2));
+        nextScreen.moveToFront();
+        nextScreen.setLocation(10,0);
+    }
+
 
     void updatePontuacao(String text){
         pontuacao.setText(text);
@@ -85,11 +113,19 @@ public class ScoreScreen extends JFrame implements ActionListener{
         spawnY = random.nextInt(StaticValues.WIDTH_UNIT);
     }
 
+    void redraw(){
+        gamePanel.setTables(engine.getLayer(), engine.getTable());
+        gamePanel.commandRepaint();
+    }
+    void updateNext(){
+        nextPanel.setTables(engine.getNext());
+        nextPanel.commandRepaint();
+    }
+
     public void move() {
         engine.move(direction);
         direction = 'd';
-        gamePanel.setTables(engine.getLayer(), engine.getTable());
-        gamePanel.commandRepaint();
+        redraw();
         flipLock = 0;
     }
 
@@ -99,6 +135,7 @@ public class ScoreScreen extends JFrame implements ActionListener{
             engine.clearProp();
             makeScore();
             engine.reset();
+            updateNext();
         }
         if (engine.collision() == 3) {
             System.out.println("GAME OVER");
@@ -125,9 +162,6 @@ public class ScoreScreen extends JFrame implements ActionListener{
         updatePontuacao(String.valueOf(player1Score));
     }
 
-    public void gameOver(Graphics g) {
-
-    }
 
     public void startGame() {
         playSound.playSound("TetrisMusic.wav");
@@ -137,6 +171,7 @@ public class ScoreScreen extends JFrame implements ActionListener{
         timer = new Timer(StaticValues.DELAY, this);
         timer.start();
         gamePanel.commandRepaint();
+        updateNext();
     }
 
     @Override
@@ -158,8 +193,7 @@ public class ScoreScreen extends JFrame implements ActionListener{
                     if (engine.collision() == 0) {
                         move();
                     }
-                    gamePanel.setTables(engine.getLayer(), engine.getTable());
-                    gamePanel.commandRepaint();
+                    redraw();
 //                    System.out.println(direction);
                     break;
                 }
@@ -168,8 +202,7 @@ public class ScoreScreen extends JFrame implements ActionListener{
                     if (engine.collision() == 0) {
                         move();
                     }
-                    gamePanel.setTables(engine.getLayer(), engine.getTable());
-                    gamePanel.commandRepaint();
+                    redraw();
 //                    System.out.println(direction);
                     break;
                 }
@@ -179,8 +212,7 @@ public class ScoreScreen extends JFrame implements ActionListener{
                         littleScore();
                         move();
                     }
-                    gamePanel.setTables(engine.getLayer(), engine.getTable());
-                    gamePanel.commandRepaint();
+                    redraw();
                     break;
                 }
                 case KeyEvent.VK_UP: {
@@ -190,8 +222,7 @@ public class ScoreScreen extends JFrame implements ActionListener{
                             flipLock = 1;
                         }
                         playSound.playSound("rotate.wav");
-                        gamePanel.setTables(engine.getLayer(), engine.getTable());
-                        gamePanel.commandRepaint();
+                        redraw();
                     }
                     break;
                 }

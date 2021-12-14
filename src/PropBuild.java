@@ -74,14 +74,14 @@ public class PropBuild {
 
             }
             case 4:{ // prop I type
-                if (side == 1 || side == 3) {
+                if (side == 2 || side == 4) {
                     layer[h][w] = color;
                     layer[h + 1][w] = color;
                     layer[h + 2][w] = color;
                     layer[h + 3][w] = color;
                     break;
                 }
-                if (side == 2 || side == 4) {
+                if (side == 1 || side == 3) {
                     layer[h][w] = color;
                     layer[h][w+1] = color;
                     layer[h][w+2]= color;
