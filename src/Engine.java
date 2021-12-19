@@ -6,12 +6,13 @@ public class Engine {
     int [][]layer = new int[StaticValues.HEIGHT_UNIT][StaticValues.WIDTH_UNIT];
     int [][]layer2 = new int[StaticValues.HEIGHT_UNIT][StaticValues.WIDTH_UNIT];
     int [][]next = new int[StaticValues.HEIGHT_UNIT][StaticValues.WIDTH_UNIT];
-    int [][]hold = new int[StaticValues.HEIGHT_UNIT][StaticValues.WIDTH_UNIT];
+    int [][]vault = new int[StaticValues.HEIGHT_UNIT][StaticValues.WIDTH_UNIT];
     PropBuild prop =new PropBuild();
     Random random3 = new Random();
 
     int hit = 0;
     int propCount = 8;
+    int vaultPiece;
     int propSelected = generateRandom(propCount);
     int propSelected2 = generateRandom(propCount);
     int propSelected3 = generateRandom(propCount);
@@ -98,7 +99,44 @@ public class Engine {
 
 
     }
+    public int[][] getVault() {
+        return vault;
+    }
 
+    public void setVault(int[][] vault) {
+        this.vault = vault;
+    }
+
+    int[][] vaultPiece(){
+        int [][]a = new int[StaticValues.HEIGHT_UNIT][StaticValues.WIDTH_UNIT];
+        int b;
+        a = prop.propBuild(propSelected,1, 1,propSelected,1);// 1
+        b = propSelected;
+
+        if(vaultPiece!=0){// se nao vasio
+            propSelected = vaultPiece;
+            color = vaultPiece;
+        }else {
+            reset();
+        }
+
+        for(int j=0;j<StaticValues.NEXT_WIDTH;j++){// limpa tela
+            for(int k=0;k<StaticValues.NEXT_HEIGHT;k++){
+                vault[k][j] = 0;
+            }
+        }
+        for(int j=0;j<StaticValues.NEXT_WIDTH;j++){// armazena
+            for(int k=0;k<StaticValues.NEXT_HEIGHT;k++){
+                if (a[k][j]!=0){
+                    vault[k][j] = a[k][j];
+                }
+            }
+        }
+
+        setH(0);
+        vaultPiece = b;
+        return vault;
+    }
 
     public int getH() {
         return h;
@@ -225,14 +263,26 @@ public class Engine {
             layer2 = prop.propBuild(propSelected,getH(), getW(),color,propSide);
             if(collision()!=0) {
                 System.out.println(propSide);
-                unFlip();
+                if(propSide>1){
+                    propSide--;
+                }else{
+                    propSide = 4;
+                }
+                layer2 = layer;
+                hit=0;
 
                 layer = prop.propBuild(propSelected,getH(), getW(),color,propSide);
             }else{
                 layer2 = layer;
             }
         }catch (Exception e){
-            unFlip();
+            if(propSide>1){
+                propSide--;
+            }else{
+                propSide = 4;
+            }
+            layer2 = layer;
+            hit=0;
         }
         hit = 0;
         //down();
@@ -244,7 +294,32 @@ public class Engine {
             propSide = 4;
         }
         layer2 = layer;
-        hit=0;
+        try {
+            layer2 = prop.propBuild(propSelected,getH(), getW(),color,propSide);
+            if(collision()!=0) {
+                if(propSide<4){
+                    propSide++;
+                }else{
+                    propSide = 1;
+                }
+                layer2 = layer;
+                hit=0;
+
+                layer = prop.propBuild(propSelected,getH(), getW(),color,propSide);
+            }else{
+                layer2 = layer;
+            }
+        }catch (Exception e){
+            if(propSide<4){
+                propSide++;
+            }else{
+                propSide = 1;
+            }
+            layer2 = layer;
+            hit=0;
+        }
+        hit = 0;
+        //down();
     }
 
     int collision(){
@@ -265,6 +340,22 @@ public class Engine {
 
         return hit;
     }
+    int detectGameOver(){
+        if(hit!=3){
+            //Hit detection between prop and table pieces
+            for(int j=0;j<StaticValues.WIDTH_UNIT;j++){
+                if (table[0][j]!=0){
+                    hit = 3;
+                    return hit;
+                }
+            }
+        }
+
+
+        return hit;
+    }
+
+
     Score lineScoreDetect(){
         Score score = new Score();
         for(int k=0;k<StaticValues.HEIGHT_UNIT;k++){

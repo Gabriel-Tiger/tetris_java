@@ -13,6 +13,11 @@ public class ScoreScreen extends JFrame implements ActionListener{
     private JButton xButton;
     private JPanel desktopHolder;
     private JPanel piecesHolder;
+    private JPanel vaultHolder;
+    private JLabel n1;
+    private JLabel n2;
+    private JLabel n3;
+    private JLabel n4;
 
 
     Score score = new Score();
@@ -20,6 +25,7 @@ public class ScoreScreen extends JFrame implements ActionListener{
     int spawnX;
     int spawnY;
     int flipLock = 0;
+    int colisionLock = 0;
     char direction = 'd';
     boolean running = false;
     Timer timer;
@@ -29,8 +35,13 @@ public class ScoreScreen extends JFrame implements ActionListener{
 
     GamePanel gamePanel = new GamePanel();
     NextPanel nextPanel = new NextPanel();
+    NextPanel vaultPanel = new NextPanel();
     JInternalFrame gameScreen = new JInternalFrame(("Tetris"), false, false, false,false);
     JInternalFrame nextScreen = new JInternalFrame(("Tetris"), false, false, false,false);
+    JInternalFrame vaultScreen = new JInternalFrame(("Tetris"), false, false, false,false);
+
+    CSV csv = new CSV();
+    BestScore bestScore = new BestScore();
 
     ScoreScreen() {
         this.addKeyListener(new MyKeyAdapter());//adiciona reconhecimento das teclas
@@ -50,6 +61,14 @@ public class ScoreScreen extends JFrame implements ActionListener{
         nextPane.setBackground(c);
         ////------------------------
 
+        ////vault screen ------------
+        JDesktopPane vaultPane = new JDesktopPane();
+        vaultPane.add(vaultScreen);
+        vaultHolder.add(vaultPane);
+        vaultPane.setBackground(c);
+        ////------------------------
+
+
         xButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -59,6 +78,9 @@ public class ScoreScreen extends JFrame implements ActionListener{
 
         setPlayer1InternalFrame();
         setNextInternalFrame();
+        setVaultInternalFrame();
+
+        loadScoreBoard();
 
         startGame();
 
@@ -70,6 +92,13 @@ public class ScoreScreen extends JFrame implements ActionListener{
         this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         this.setVisible(true);
 
+    }
+    void loadScoreBoard(){
+        bestScore.loadScore();
+        n1.setText(bestScore.getNick1() + " " + bestScore.getN1());
+        n2.setText(bestScore.getNick2() + " " + bestScore.getN2());
+        n3.setText(bestScore.getNick3() + " " + bestScore.getN3());
+        n4.setText(bestScore.getNick4() + " " + bestScore.getN4());
     }
 
     void setPlayer1InternalFrame(){
@@ -85,7 +114,7 @@ public class ScoreScreen extends JFrame implements ActionListener{
         gameScreen.setVisible(true);
         gameScreen.setSize(new Dimension(400, 800));
         gameScreen.moveToFront();
-        gameScreen.setLocation(StaticValues.SCREEN_WIDTH,0);
+        gameScreen.setLocation(1,0);
     }
     void setNextInternalFrame(){
         //para nao mover--------
@@ -98,9 +127,25 @@ public class ScoreScreen extends JFrame implements ActionListener{
         nextScreen.putClientProperty("JInternalFrame.isPalette", Boolean.TRUE);
         nextScreen.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
         nextScreen.setVisible(true);
-        nextScreen.setSize(new Dimension(StaticValues.SCREEN_WIDTH/2, StaticValues.SCREEN_HEIGHT/2));
+        nextScreen.setSize(new Dimension((StaticValues.SCREEN_WIDTH/2)+StaticValues.UNIT_SIZE, StaticValues.SCREEN_HEIGHT/2));
         nextScreen.moveToFront();
         nextScreen.setLocation(10,0);
+    }
+
+    void setVaultInternalFrame(){
+        //para nao mover--------
+        for(MouseListener listener : ((javax.swing.plaf.basic.BasicInternalFrameUI) this.vaultScreen.getUI()).getNorthPane().getMouseListeners()){
+            ((javax.swing.plaf.basic.BasicInternalFrameUI) this.vaultScreen.getUI()).getNorthPane().removeMouseListener(listener);
+        }
+        //----------------------
+        ((javax.swing.plaf.basic.BasicInternalFrameUI)vaultScreen.getUI()).setNorthPane(null);//remove o title bar do internaljframe
+        vaultScreen.add(vaultPanel);
+        vaultScreen.putClientProperty("JInternalFrame.isPalette", Boolean.TRUE);
+        vaultScreen.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
+        vaultScreen.setVisible(true);
+        vaultScreen.setSize(new Dimension((StaticValues.SCREEN_WIDTH/2)+StaticValues.UNIT_SIZE, StaticValues.SCREEN_HEIGHT/4));
+        vaultScreen.moveToFront();
+        vaultScreen.setLocation(10,0);
     }
 
 
@@ -122,6 +167,13 @@ public class ScoreScreen extends JFrame implements ActionListener{
         nextPanel.commandRepaint();
     }
 
+    void updateVault(){
+        vaultPanel.setTables(engine.vaultPiece());
+        vaultPanel.commandRepaint();
+        updateNext();
+    }
+
+
     public void move() {
         engine.move(direction);
         direction = 'd';
@@ -136,16 +188,28 @@ public class ScoreScreen extends JFrame implements ActionListener{
             makeScore();
             engine.reset();
             updateNext();
+            colisionLock =0;
+            if(engine.detectGameOver()==3){
+                gameOver();
+                return;
+            }
         }
         if (engine.collision() == 3) {
-            System.out.println("GAME OVER");
-            playSound.playSound("hit-03.wav");
-            engine.tableAddPieces();
-            engine.reset();
-            running = false;
+            gameOver();
+            return;
         }
 
     }
+
+    void gameOver(){
+        System.out.println("GAME OVER");
+        playSound.playSound("hit-03.wav");
+        running = false;
+        String name = JOptionPane.showInputDialog("Digite seu Nick/Nome");
+        bestScore.recordScore(String.valueOf(player1Score),name);
+        bestScore.saveScore();
+    }
+
     void makeScore(){
         score = engine.lineScoreDetect();
         if (score.done) {
@@ -188,7 +252,7 @@ public class ScoreScreen extends JFrame implements ActionListener{
         @Override
         public void keyPressed(KeyEvent e) {
             switch (e.getKeyCode()) {
-                case KeyEvent.VK_LEFT: {
+                case KeyEvent.VK_A: {
                     direction = 'l';
                     if (engine.collision() == 0) {
                         move();
@@ -197,7 +261,7 @@ public class ScoreScreen extends JFrame implements ActionListener{
 //                    System.out.println(direction);
                     break;
                 }
-                case KeyEvent.VK_RIGHT: {
+                case KeyEvent.VK_D: {
                     direction = 'r';
                     if (engine.collision() == 0) {
                         move();
@@ -206,7 +270,7 @@ public class ScoreScreen extends JFrame implements ActionListener{
 //                    System.out.println(direction);
                     break;
                 }
-                case KeyEvent.VK_DOWN: {
+                case KeyEvent.VK_S: {
                     direction = 'd';
                     if (engine.collision() == 0) {
                         littleScore();
@@ -215,7 +279,7 @@ public class ScoreScreen extends JFrame implements ActionListener{
                     redraw();
                     break;
                 }
-                case KeyEvent.VK_UP: {
+                case KeyEvent.VK_LEFT: {//flip
                     if (flipLock == 0) {
                         if (engine.collision() == 0) {
                             engine.flip();
@@ -226,6 +290,29 @@ public class ScoreScreen extends JFrame implements ActionListener{
                     }
                     break;
                 }
+                case KeyEvent.VK_C: {//guarda peça
+                    if (colisionLock == 0) {
+                        if (engine.collision() == 0) {
+                            updateVault();
+                            colisionLock = 1;
+                        }
+                        playSound.playSound("rotate.wav");
+                        redraw();
+                    }
+                    break;
+                }
+                case KeyEvent.VK_RIGHT: {//unflip
+                    if (flipLock == 0) {
+                        if (engine.collision() == 0) {
+                            engine.unFlip();
+                            flipLock = 1;
+                        }
+                        playSound.playSound("rotate.wav");
+                        redraw();
+                    }
+                    break;
+                }
+
             }
         }
     }
