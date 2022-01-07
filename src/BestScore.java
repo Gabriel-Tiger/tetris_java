@@ -94,8 +94,8 @@ public class BestScore {
     }
 
     public void recordScore(String score, String nick) {
-        System.out.println(score);
-        System.out.println(nick);
+//        System.out.println(score);
+//        System.out.println(nick);
         if (Integer.parseInt(score) > Integer.parseInt(getN1())) {
             setN4(getN3());
             setN3(getN2());

@@ -4,5 +4,6 @@ public class SerginhoSimulator {
         CSV csv = new CSV();
         csv.init();
         new ScoreScreen();
+
     }
 }

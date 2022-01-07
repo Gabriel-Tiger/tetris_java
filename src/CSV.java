@@ -92,7 +92,7 @@ public class CSV {
 
                 linha = buffer.readLine();
             }
-            System.out.println(data);
+           // System.out.println(data);
             buffer.close();
         } catch (Exception e) {
             e.printStackTrace();
