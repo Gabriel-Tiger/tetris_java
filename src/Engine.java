@@ -217,6 +217,9 @@ public class Engine {
 //        down();
     }
     void down(){
+        //redraw layers to avoid game time tick override flip action
+        layer2 = prop.propBuild(propSelected,getH(), getW(),color,propSide);
+        layer = prop.propBuild(propSelected,getH(), getW(),color,propSide);
         try {
             setH(getH()+1);
             //Test border
@@ -254,26 +257,28 @@ public class Engine {
     }
 
     void flip(){
-        if(propSide<4){
+        if(propSide<4){//execute flip
             propSide++;
         }else{
             propSide = 1;
         }
         try {
-            layer2 = prop.propBuild(propSelected,getH(), getW(),color,propSide);
-            if(collision()!=0) {
-                System.out.println(propSide);
+            layer2 = prop.propBuild(propSelected,getH(), getW(),color,propSide);//try to draw the piece, if hit the border will
+                                                                                //generate an error breaking the try/catch block.
+                                                                                //Use layer2 to preserver old position
+            int collisionCheck = collision();
+            if(collisionCheck !=0) {//check collision, if true revert flip
                 if(propSide>1){
                     propSide--;
                 }else{
                     propSide = 4;
                 }
-                layer2 = layer;
-                hit=0;
-
+                hit=0;//reset collision check
+                clearProp();
+                layer2 = prop.propBuild(propSelected,getH(), getW(),color,propSide);
                 layer = prop.propBuild(propSelected,getH(), getW(),color,propSide);
             }else{
-                layer2 = layer;
+                layer2 = prop.propBuild(propSelected,getH(), getW(),color,propSide);
             }
         }catch (Exception e){
             if(propSide>1){
