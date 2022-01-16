@@ -1,12 +1,15 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
+import java.beans.VetoableChangeListener;
 import java.util.Random;
 
-public class ScoreScreen extends JFrame implements ActionListener {
+public class MainFrame extends JFrame implements ActionListener {
 
-    private JFrame scoreFrame = new JFrame();
-    private JPanel scorePanel;
+    private JFrame mainFrame = new JFrame();
     private JLabel pontuacao;
     private JPanel mainPanel;
     private JPanel topBar;
@@ -23,6 +26,11 @@ public class ScoreScreen extends JFrame implements ActionListener {
     private JButton playButton;
     private JPanel menuPanelContainer;
     private JSlider slider1;
+    private JButton volumePlus;
+    private JButton volumeMinus;
+    private JButton volumeMusciPlus;
+    private JButton volumeMusicMinus;
+    private JLabel linhas;
 
     Action upAction;
     Action downAction;
@@ -32,7 +40,6 @@ public class ScoreScreen extends JFrame implements ActionListener {
     Action lRotateAction;
     Action rRotateAction;
 
-
     Score score = new Score();
     int player1Score = 0;
     int spawnX;
@@ -41,6 +48,8 @@ public class ScoreScreen extends JFrame implements ActionListener {
     int colisionLock = 0;
     char direction = 'd';
     boolean running = false;
+    int lineCount = 0;
+    int superScore = 0;
     StaticValues staticValues = new StaticValues();
     Timer timer = new Timer(staticValues.getDELAY(), this);
     Random random = new Random();
@@ -58,8 +67,8 @@ public class ScoreScreen extends JFrame implements ActionListener {
     CSV csv = new CSV();
     BestScore bestScore = new BestScore();
 
-    ScoreScreen() {
-        //Key binds --------------
+    MainFrame() {
+        /////Key binds --------------
         upAction = new UpAction();
         downAction = new DownAction();
         leftAction = new LeftAction();
@@ -79,9 +88,7 @@ public class ScoreScreen extends JFrame implements ActionListener {
         gameScreen.getActionMap().put("lRotateAction", lRotateAction);
         gameScreen.getInputMap().put(KeyStroke.getKeyStroke('d'), "rRotateAction");
         gameScreen.getActionMap().put("rRotateAction", rRotateAction);
-
-
-        //------------------------
+        /////------------------------
 
         /////Slider---------------
         slider1.setMinimum(50);
@@ -92,7 +99,7 @@ public class ScoreScreen extends JFrame implements ActionListener {
 
         menuPanelContainer.setVisible(false);
         //scoreFrame.addKeyListener(new MyKeyAdapter());//adiciona reconhecimento das teclas
-        scoreFrame.setUndecorated(true);//remove as bordas do windows
+        mainFrame.setUndecorated(true);//remove as bordas do windows
 
 
         ////game screen ------------
@@ -117,29 +124,20 @@ public class ScoreScreen extends JFrame implements ActionListener {
         vaultPane.setBackground(c);
         ////------------------------
 
-
-        xButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
-
+        setGameResolution();//Check monitor resolution and adapt game size if less than fullhd
         setPlayer1InternalFrame();
         setNextInternalFrame();
         setVaultInternalFrame();
-
         loadScoreBoard();
-
         startGame();
 
-        scoreFrame.add(mainPanel);
-        scoreFrame.pack();
+        mainFrame.add(mainPanel);
+        mainFrame.pack();
         //this.setAlwaysOnTop(true);
-        scoreFrame.setFocusable(true);
-        scoreFrame.requestFocusInWindow();
-        scoreFrame.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-        scoreFrame.setVisible(true);
+        mainFrame.setFocusable(true);
+        mainFrame.requestFocusInWindow();
+        mainFrame.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+        mainFrame.setVisible(true);
 
         ////Start on menu--------
         timer.stop();
@@ -148,6 +146,14 @@ public class ScoreScreen extends JFrame implements ActionListener {
         menuPanelContainer.setVisible(true);
         ////---------------------
 
+
+        xButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+
         menuButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -155,7 +161,6 @@ public class ScoreScreen extends JFrame implements ActionListener {
                 System.out.println("pause");
                 gamePanelMainContainer.setVisible(false);
                 menuPanelContainer.setVisible(true);
-
             }
         });
 
@@ -172,6 +177,43 @@ public class ScoreScreen extends JFrame implements ActionListener {
                 gameScreen.requestFocusInWindow();//pede foco para as teclas funcionarem
             }
         });
+        volumePlus.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PlaySound.volumePlus();
+            }
+        });
+        volumeMinus.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PlaySound.volumeMinus();
+            }
+        });
+        volumeMusciPlus.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PlaySound.volumeMusicPlus();
+            }
+        });
+        volumeMusicMinus.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PlaySound.volumeMusicMinus();
+            }
+        });
+    }
+
+
+    private void setGameResolution() {
+        Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
+
+        int height = (int) size.getHeight();
+        System.out.print(height);
+        if (height < 1080) {
+            StaticValues.SCREEN_WIDTH = 300;
+            StaticValues.SCREEN_HEIGHT = 600;
+            StaticValues.UNIT_SIZE = 30;
+        }
     }
 
     public class UpAction extends AbstractAction {
@@ -224,12 +266,14 @@ public class ScoreScreen extends JFrame implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (engine.collision() == 0) {
-                updateVault();
-                colisionLock = 1;
+            if (colisionLock == 0) {
+                if (engine.collision() == 0) {
+                    updateVault();
+                    colisionLock = 1;
+                }
+                PlaySound.playSound("rotate.wav");
+                redraw();
             }
-            playSound.playSound("rotate.wav");
-            redraw();
         }
     }
 
@@ -242,7 +286,7 @@ public class ScoreScreen extends JFrame implements ActionListener {
                     engine.flip();
                     flipLock = 1;
                 }
-                playSound.playSound("rotate.wav");
+                PlaySound.playSound("rotate.wav");
                 redraw();
             }
         }
@@ -257,17 +301,10 @@ public class ScoreScreen extends JFrame implements ActionListener {
                     engine.unFlip();
                     flipLock = 1;
                 }
-                playSound.playSound("rotate.wav");
+                PlaySound.playSound("rotate.wav");
                 redraw();
             }
         }
-    }
-
-
-    Integer getInt(String text) {
-        Integer i = Integer.parseInt(text);
-        //System.out.println(i);
-        return i;
     }
 
     void loadScoreBoard() {
@@ -289,7 +326,7 @@ public class ScoreScreen extends JFrame implements ActionListener {
         gameScreen.putClientProperty("JInternalFrame.isPalette", Boolean.TRUE);
         gameScreen.getRootPane().setWindowDecorationStyle(JRootPane.NONE);
         gameScreen.setVisible(true);
-        gameScreen.setSize(new Dimension(400, 800));
+        gameScreen.setSize(new Dimension(StaticValues.SCREEN_WIDTH, StaticValues.SCREEN_HEIGHT));
         gameScreen.moveToFront();
         gameScreen.setLocation(1, 0);
     }
@@ -382,22 +419,35 @@ public class ScoreScreen extends JFrame implements ActionListener {
 
     void gameOver() {
         System.out.println("GAME OVER");
-        playSound.playSound("hit-03.wav");
+        PlaySound.playSound("hit-03.wav");
         running = false;
         String name = JOptionPane.showInputDialog("Digite seu Nick/Nome");
         bestScore.recordScore(String.valueOf(player1Score), name);
         bestScore.saveScore();
+        mainFrame.dispose();
+        new MainFrame();
     }
 
     void makeScore() {
         score = engine.lineScoreDetect();
         if (score.done) {
-            player1Score = player1Score + 10;
+            lineCount++;
+            player1Score = player1Score + 100;
             //System.out.println(player1Score);
             engine.lineScoreDownAnimation(score);
             updatePontuacao(String.valueOf(player1Score));
-            playSound.playSound("point-01.wav");
+            linhas.setText(String.valueOf(lineCount));
+            PlaySound.playSound("point-01.wav");
+            superScore++;
+            if (superScore >= 4) {
+                player1Score = player1Score + 1000;
+                updatePontuacao(String.valueOf(player1Score));
+                PlaySound.playSound("point-02.wav");
+            }
+
             makeScore();
+        } else {
+            superScore = 0;
         }
     }
 
@@ -408,7 +458,7 @@ public class ScoreScreen extends JFrame implements ActionListener {
 
 
     public void startGame() {
-        playSound.playSound("TetrisMusic.wav");
+        PlaySound.playSound("TetrisMusic.wav", 1);
         newBlock();
         engine = new Engine(spawnX, spawnY);
         running = true;

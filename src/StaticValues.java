@@ -8,6 +8,25 @@ public class StaticValues {
     static int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE;
     static int NEXT_WIDTH = (int) (SCREEN_WIDTH / (UNIT_SIZE * 2));
     static int NEXT_HEIGHT = (int) (SCREEN_HEIGHT / (UNIT_SIZE * 2));
+    static float volume = -30;
+    static float volumeMusic = -50;
+
+    public static float getVolumeMusic() {
+        return volumeMusic;
+    }
+
+    public static void setVolumeMusic(float volumeMusic) {
+        StaticValues.volumeMusic = volumeMusic;
+    }
+
+
+    public static float getVolume() {
+        return volume;
+    }
+
+    public static void setVolume(float volume) {
+        StaticValues.volume = volume;
+    }
 
 
     public int getDELAY() {

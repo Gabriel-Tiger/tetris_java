@@ -8,7 +8,8 @@ public class SerginhoSimulator {
     public static void main(String[] args) {
         CSV csv = new CSV();
         csv.init();
-        new ScoreScreen();
+
+        new MainFrame();
 
     }
 }

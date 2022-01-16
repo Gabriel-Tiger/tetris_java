@@ -133,7 +133,8 @@ public class Engine {
             }
         }
 
-        setH(0);
+        setH(0);//reset position
+        setW(3);
         vaultPiece = b;
         return vault;
     }
@@ -239,7 +240,7 @@ public class Engine {
             }
         }catch (Exception e){
             hit = 2;
-            playSound.playSound("hit-01.wav");
+            PlaySound.playSound("hit-01.wav");
         }
     }
 
@@ -433,6 +434,7 @@ public class Engine {
             Random random = new Random();
             startPoint = random.nextInt((StaticValues.WIDTH_UNIT));
             //Set initial position
+            //setW((Integer)(StaticValues.WIDTH_UNIT/2)-2); if not random start
             setW(startPoint);
             setH(0);
             //layer initial position
